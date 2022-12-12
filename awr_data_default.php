@@ -125,8 +125,8 @@
                                         
                                         // - Check if average_monthly_searches is > 0
                                         if ($data[9] > 0) {
-                                            $sql_insert = "INSERT INTO ".$table." (date, search_engine, keyword, keyword_group, website, url, position, best, competition, average_monthly_searches, cpc, page, type, local_searches, estimated_daily_traffic)
-                                            VALUES ('".$data[0]."', '".$data[1]."', '".$data[2]."', '".$data[3]."', '".$data[4]."', '".$data[5]."', '".$data[6]."', '".$data[7]."', '".$data[8]."', '".$data[9]."', '".$data[10]."', '".$data[11]."', '".$data[12]."', '".$data[14]."', '".$data[15]."')";
+                                            $sql_insert = "INSERT INTO ".$table." (date, search_engine, keyword, keyword_group, website, url, position, best, competition, average_monthly_searches, cpc, page, type, local_searches, estimated_daily_traffic, project_client)
+                                            VALUES ('".$data[0]."', '".$data[1]."', '".$data[2]."', '".$data[3]."', '".$data[4]."', '".$data[5]."', '".$data[6]."', '".$data[7]."', '".$data[8]."', '".$data[9]."', '".$data[10]."', '".$data[11]."', '".$data[12]."', '".$data[14]."', '".$data[15]."', '".$project_name_sanitized."')";
 
                                             if ($con->query($sql_insert) === TRUE) {
                                             
