@@ -12,13 +12,16 @@
         require_once("conn.php");
 
         // --- Array lists to run
-        $array_projects = ["www.fji.dk"];
+        $array_projects = array(
+            array("www.fji.dk", "fji.dk/")
+        );
         $token = "1e4a1d8dc5cf80f19b468f28f640e841";
 
         foreach ($array_projects as $key) {
             // - Variables
-            $project_name = $key;
+            $project_name = $key[0];
             $project_name_sanitized = preg_replace("/[\W_]+/u", '', $project_name);
+            $project_website = $key[1];
 
             // - Check if database table already exists
             function databaseTableHandler($project_name_sanitized, $con) {
@@ -67,9 +70,10 @@
             }
             databaseTableHandler($project_name_sanitized, $con);
 
-            // - First empty the "exported_data_csv" folder
+            // - First empty the "exported_data_csv" folder & zip folder.
             try {
-                // array_map( 'unlink', array_filter((array) glob("exported_data_csv/*") ) );
+                array_map( 'unlink', array_filter((array) glob("exported_data_csv/*") ) );
+                array_map( 'unlink', array_filter((array) glob("zip_file/*") ) );
             } catch (\Throwable $th) {
                 throw $th;
             } finally {
@@ -87,28 +91,26 @@
                         // - Project has already been exported OR has not been exported yet
                         $csv_link = $response["details"];
 
-                        $f = file_put_contents("my-zip.zip", fopen($csv_link, 'r'), LOCK_EX);
+                        $f = file_put_contents("zip_file/my-zip.zip", fopen($csv_link, 'r'), LOCK_EX);
                         if(FALSE === $f) {
                             echo "ErrorResponse: Couldn't write to file.";
                         }
 
                         $zip = new ZipArchive;
-                        $res = $zip->open('my-zip.zip');
+                        $res = $zip->open('zip_file/my-zip.zip');
                         if ($res === TRUE) {
                             $zip->extractTo('exported_data_csv');
                             $zip->close();
                             echo "<script>console.log('.zip extracted successfully.')</script>";
 
-                            // - File extracted successfully from ZIP, create database table if doesn't exists;
-                            handleCSVData();
                         } else {
                             echo "ErrorResponse: .zip results couldn't be extracted.";
                         }
                     }
                 }
-                // exportRanking($project_name, $token, $project_date);
+                exportRanking($project_name, $token, $project_date);
 
-                function handleCSVData($project_name_sanitized, $con) {
+                function handleCSVData($project_name_sanitized, $project_website, $con) {
                     $files = glob('exported_data_csv/*csv');
                     $iterator_files = 0;
                     foreach($files as $file) {
@@ -124,7 +126,7 @@
                                         $table = "awr_data_default_".$project_name_sanitized;
                                         
                                         // - Check if average_monthly_searches is > 0
-                                        if ($data[9] > 0) {
+                                        if ($data[4] === $project_website) {
                                             $sql_insert = "INSERT INTO ".$table." (date, search_engine, keyword, keyword_group, website, url, position, best, competition, average_monthly_searches, cpc, page, type, local_searches, estimated_daily_traffic, project_client)
                                             VALUES ('".$data[0]."', '".$data[1]."', '".$data[2]."', '".$data[3]."', '".$data[4]."', '".$data[5]."', '".$data[6]."', '".$data[7]."', '".$data[8]."', '".$data[9]."', '".$data[10]."', '".$data[11]."', '".$data[12]."', '".$data[14]."', '".$data[15]."', '".$project_name_sanitized."')";
 
@@ -144,7 +146,7 @@
                         }
                     }
                 }
-                handleCSVData($project_name_sanitized, $con);
+                handleCSVData($project_name_sanitized, $project_website, $con);
             }
         }
     ?>
