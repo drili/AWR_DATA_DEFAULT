@@ -26,9 +26,6 @@
             // - Check if database table already exists
             function databaseTableHandler($project_name_sanitized, $con) {
                 $table_suffix = $project_name_sanitized;
-                // $sql_check_db = mysqli_query($con, "SELECT 1 FROM 'awr_data_default_".$table_suffix."' LIMIT 1");
-
-                // var_dump($sql_check_db);
 
                 if (mysqli_query($con, "DESCRIBE `awr_data_default_".$table_suffix."`")) {
                     // - Table exists, empty table
