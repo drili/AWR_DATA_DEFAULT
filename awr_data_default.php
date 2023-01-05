@@ -16,7 +16,6 @@
             array("byravn.dk", "byravn.dk"),
             array("byravn.se", "byravn.se"),
             array("byravn.no", "byravn.no/"),
-            array("eurodan-huse.dk", "eurodan-huse.dk"),
             array("vestermarkribe.dk", "vestermarkribe.dk/")
         );
         $token = "1e4a1d8dc5cf80f19b468f28f640e841";
