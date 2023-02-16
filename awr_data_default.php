@@ -13,10 +13,12 @@
 
         // --- Array lists to run
         $array_projects = array(
-            array("byravn.dk", "byravn.dk"),
-            array("byravn.se", "byravn.se"),
-            array("byravn.no", "byravn.no/"),
-            array("vestermarkribe.dk", "vestermarkribe.dk/")
+            // array("byravn.dk", "byravn.dk"),
+            // array("byravn.se", "byravn.se"),
+            // array("byravn.no", "byravn.no/"),
+            // array("vestermarkribe.dk", "vestermarkribe.dk/")
+            // array("eurodan-huse.dk", "eurodan-huse.dk")
+            array("www.northernhunting.com", "www.northernhunting.com/")
         );
         $token = "1e4a1d8dc5cf80f19b468f28f640e841";
 
@@ -33,7 +35,7 @@
                 // - Table exists, empty table
                 mysqli_query($con, "TRUNCATE TABLE `awr_data_default_".$table_suffix."`");
                 echo "<script>console.log('SQL table already exists (awr_data_default_".$table_suffix."). - table emptied')</script>";
-                return;
+                // return;
             } else {
                 // - Table does not exists, create it
                 $sql_create_table = "CREATE TABLE `awr_data_default_".$table_suffix."` (
@@ -69,6 +71,7 @@
 
             // - First empty the "exported_data_csv" folder & zip folder.
             try {
+                echo "HI";
                 array_map( 'unlink', array_filter((array) glob("exported_data_csv/*") ) );
                 array_map( 'unlink', array_filter((array) glob("zip_file/*") ) );
             } catch (\Throwable $th) {
@@ -82,6 +85,7 @@
                 // - Export Ranking
                 $url = "https://api.awrcloud.com/v2/get.php?action=export_ranking&project=".$project_name."&token=".$token."&startDate=".$project_date."&stopDate=2022-12-12";
                 $response = json_decode(file_get_contents($url), true);
+                echo "url: $url <br>";
 
                 if ($response["response_code"] === 10 || $response["response_code"] === 0) {
                     // - Project has already been exported OR has not been exported yet
@@ -104,6 +108,7 @@
                     }
                 }
 
+                sleep(10);
                 $files = glob('exported_data_csv/*csv');
                 $iterator_files = 0;
                 foreach($files as $file) {
@@ -119,16 +124,16 @@
                                     $table = "awr_data_default_".$project_name_sanitized;
                                     
                                     // - Check if average_monthly_searches is > 0
-                                    if ($data[4] === $project_website) {
+                                    // if ($data[4] === $project_website) {
                                         $sql_insert = "INSERT INTO ".$table." (date, search_engine, keyword, keyword_group, website, url, position, best, competition, average_monthly_searches, cpc, page, type, local_searches, estimated_daily_traffic, project_client)
                                         VALUES ('".mysqli_real_escape_string($con, $data[0])."', '".mysqli_real_escape_string($con, $data[1])."', '".mysqli_real_escape_string($con, $data[2])."', '".mysqli_real_escape_string($con, $data[3])."', '".mysqli_real_escape_string($con, $data[4])."', '".mysqli_real_escape_string($con, $data[5])."', '".mysqli_real_escape_string($con, $data[6])."', '".mysqli_real_escape_string($con, $data[7])."', '".mysqli_real_escape_string($con, $data[8])."', '".mysqli_real_escape_string($con, $data[9])."', '".mysqli_real_escape_string($con, $data[10])."', '".mysqli_real_escape_string($con, $data[11])."', '".mysqli_real_escape_string($con, $data[12])."', '".mysqli_real_escape_string($con, $data[14])."', '".mysqli_real_escape_string($con, $data[15])."', '".mysqli_real_escape_string($con, $project_name_sanitized)."')";
 
                                         if ($con->query($sql_insert) === TRUE) {
-                                        
+                                            // echo "true $iterator_files";
                                         } else {
                                             echo "Error: " . $sql_insert . "<br>" . $con->error;
                                         }
-                                    }
+                                    // }
                                 }
                             }
 
